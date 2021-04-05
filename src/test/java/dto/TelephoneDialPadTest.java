@@ -20,7 +20,8 @@ import java.util.List;
 public class TelephoneDialPadTest implements ITest {
 
 	static String currentDir = System.getProperty("user.dir");
-	public static String testDataExcelPath = currentDir + "\\data\\excel\\dto\\TelephoneDialPad.xlsx";
+
+	public static String testDataExcelPath;
 
 	private ThreadLocal<String> testName = new ThreadLocal<>();
 
@@ -37,6 +38,7 @@ public class TelephoneDialPadTest implements ITest {
 	 */
 	@DataProvider(name = "retrieveCombinations")
 	public Object[] retrieveCombinationsTestData() throws Exception {
+		fixURL();
 		List<LinkedHashMap<String, String>> mapDataList = ReadDataFromExcel.getExcelDataAsMap(testDataExcelPath,
 				"retrieveCombinations");
 		return mapDataList.toArray();
@@ -62,32 +64,42 @@ public class TelephoneDialPadTest implements ITest {
 	public void retrieveCombinationsTest(HashMap<String, String> data) {
 
 		try {
-
-			Reporter.log("Test Case Name: " + data.get("TC_NAME") , true);
+			fixURL();
+			Reporter.log("Test Case Name: " + data.get("TC_NAME"), true);
 			Reporter.log("Test Description: " + data.get("TC_DESCRIPTION"), true);
 			TelephoneDialPad dailpad = new TelephoneDialPad();
-			LinkedList<String> letterCombinations = dailpad.retrieveCombinations(data.get("TC_INPUT"));			
+			LinkedList<String> letterCombinations = dailpad.retrieveCombinations(data.get("TC_INPUT"));
 			Reporter.log("Letter Combinations generated: " + letterCombinations.toString() + "\n\n", true);
 //			Reporter.log("Letter Combinations expected: " + data.get("TC_EXPECTED"), true);
-			
-			if(data.get("TC_EXPECTED").toLowerCase().contains("length")) {
-				
+
+			if (data.get("TC_EXPECTED").toLowerCase().contains("length")) {
+
 				String expectedString = data.get("TC_EXPECTED").toString().split("=")[1];
 				Assert.assertEquals(letterCombinations.size(), Integer.parseInt(expectedString));
-								
+
 			} else {
-				
+
 				String expectedString = data.get("TC_EXPECTED").toString();
 				List<String> expectedList = Arrays.asList(expectedString.split("\\s*,\\s*"));
 				Assert.assertEquals(letterCombinations, expectedList);
 
-			}		
-			
+			}
+
 		} catch (Exception e) {
 
 			Assert.assertEquals(e.getClass().getSimpleName(), data.get("TC_EXPECTED"));
 		}
 
+	}
+
+	public void fixURL() {
+		// TODO
+		// Quick Fix For MAC users
+		if (currentDir.contains("\\")) {
+			testDataExcelPath = currentDir + "\\data\\excel\\dto\\TelephoneDialPad.xlsx";
+		} else {
+			testDataExcelPath = currentDir + "//data//excel//dto//TelephoneDialPad.xlsx";
+		}
 	}
 
 }
